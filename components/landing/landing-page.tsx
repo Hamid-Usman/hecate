@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { FloatingField } from "./floating-field";
 import { Mark } from "./glyphs";
 import { IsoScene } from "./iso-scene";
+import Link from "next/link";
 
 const nav = [
   { href: "#product", label: "Product" },
@@ -195,12 +196,12 @@ export function LandingPage() {
             ))}
           </nav>
           <div className="hidden items-center gap-2 lg:flex">
-            <a href="#capabilities" className="rounded-full border border-ink/15 px-4 py-2 text-sm transition hover:border-ink">
+            <Link href="#capabilities" className="rounded-full border border-ink/15 px-4 py-2 text-sm transition duration-300 ease-out hover:border-ink hover:bg-ink hover:text-paper">
               Get started
-            </a>
-            <a href="#mvp" className="rounded-full bg-rust px-4 py-2 text-sm text-paper transition hover:bg-bark">
+            </Link>
+            <Link href="#mvp" className="rounded-full bg-rust px-4 py-2 text-sm text-paper transition duration-300 ease-out hover:bg-bark">
               Contact
-            </a>
+            </Link>
           </div>
           <button
             type="button"
@@ -251,15 +252,15 @@ export function LandingPage() {
               retries, checkpoints, and conflict handling live in the platform — not in every app you ship.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#capabilities" className="rounded-full bg-rust px-5 py-3 text-sm text-paper transition hover:bg-bark">
+              <Link href="#capabilities" className="rounded-full bg-rust px-5 py-3 text-sm text-paper transition duration-300 ease-out hover:bg-bark">
                 Start building
-              </a>
-              <a href="#architecture" className="rounded-full border border-ink bg-paper/70 px-5 py-3 text-sm transition hover:bg-ink hover:text-paper">
+              </Link>
+              <Link href="#architecture" className="rounded-full border border-ink bg-paper/70 px-5 py-3 text-sm transition duration-300 ease-out hover:bg-ink hover:text-paper">
                 Explore the stack
-              </a>
+              </Link>
             </div>
             <p className="mt-6 font-mono text-[11px] tracking-wide text-slate uppercase">
-              SQLite · PostgreSQL · Expo · Go
+              Powered by Hecate's Engine. Managed through Hecate's Torch
             </p>
           </motion.div>
 
@@ -296,7 +297,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="border-y border-ink/10 bg-paper/50">
+        {/* <section className="border-y border-ink/10 bg-paper/50">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-4 px-5 py-6">
             {stackRow.map((name) => (
               <span key={name} className="font-serif text-xl text-ink/55 sm:text-2xl">
@@ -304,12 +305,12 @@ export function LandingPage() {
               </span>
             ))}
           </div>
-        </section>
+        </section> */}
 
         <section id="product" className="mx-auto max-w-6xl px-5 py-24">
           <SectionIntro
             kicker="Product"
-            title="Reusable sync, instead of a bespoke engine in every codebase."
+            title="Hecate's Engine: Reusable sync, instead of a bespoke engine in every codebase."
             body="Developers already know how to read and write a database. The hard part is keeping that data honest across an offline client and a backend that does not share a transaction."
           />
           <div className="mt-12 grid gap-4 md:grid-cols-4">
@@ -326,11 +327,12 @@ export function LandingPage() {
                 whileInView="show"
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ delay: index * 0.05 }}
-                className="rounded-3xl border border-ink/10 bg-paper/80 p-5"
+                whileHover={reduce ? undefined : { y: -6 }}
+                className="group cursor-pointer rounded-3xl border border-ink/10 bg-paper/80 p-5 transition-all duration-300 ease-out hover:border-ink hover:bg-ink hover:text-paper hover:shadow-2xl hover:shadow-ink/20"
               >
-                <p className="font-mono text-[11px] text-rust">0{index + 1}</p>
-                <h3 className="mt-3 font-serif text-2xl">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate">{body}</p>
+                <p className="font-mono text-[11px] text-rust transition-colors duration-300 group-hover:text-mist">0{index + 1}</p>
+                <h3 className="mt-3 font-serif text-2xl text-ink transition-colors duration-300 group-hover:text-paper">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate transition-colors duration-300 group-hover:text-line">{body}</p>
               </motion.article>
             ))}
           </div>
@@ -347,7 +349,8 @@ export function LandingPage() {
               whileInView="show"
               viewport={{ once: true }}
               variants={fade}
-              className="rounded-[28px] border border-ink bg-ink p-7 text-paper lg:col-span-3"
+              whileHover={reduce ? undefined : { y: -6 }}
+              className="rounded-[28px] border border-ink bg-ink p-7 text-paper transition-all duration-300 ease-out hover:border-rust/40 hover:shadow-2xl hover:shadow-ink/25 lg:col-span-3"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[11px] tracking-[0.16em] text-[#e7b5a2] uppercase">Capability A · Primary</p>
@@ -377,17 +380,18 @@ export function LandingPage() {
               whileInView="show"
               viewport={{ once: true }}
               variants={fade}
-              className="rounded-[28px] border border-ink/10 bg-paper/80 p-7 lg:col-span-2"
+              whileHover={reduce ? undefined : { y: -6 }}
+              className="group rounded-[28px] border border-ink/10 bg-paper/80 p-7 transition-all duration-300 ease-out hover:border-ink hover:bg-ink hover:text-paper hover:shadow-2xl hover:shadow-ink/25 lg:col-span-2"
             >
-              <p className="text-[11px] tracking-[0.16em] text-bark uppercase">Capability B · Next</p>
-              <h3 className="mt-4 font-serif text-4xl leading-none">Database Sync</h3>
-              <p className="mt-4 text-sm leading-6 text-slate">
+              <p className="text-[11px] tracking-[0.16em] text-bark uppercase transition-colors duration-300 group-hover:text-mist">Capability B · Next</p>
+              <h3 className="mt-4 font-serif text-4xl leading-none text-ink transition-colors duration-300 group-hover:text-paper">Database Sync</h3>
+              <p className="mt-4 text-sm leading-6 text-slate transition-colors duration-300 group-hover:text-line">
                 Independent PostgreSQL databases, captured with logical replication and applied one way. Bidirectional
                 sync waits until the one-way path is boring.
               </p>
               <ul className="mt-6 space-y-2">
                 {databaseFeatures.map((feature) => (
-                  <li key={feature} className="flex gap-2 text-sm">
+                  <li key={feature} className="flex gap-2 text-sm text-ink/90 transition-colors duration-300 group-hover:text-mist">
                     <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-rust" />
                     {feature}
                   </li>
@@ -428,12 +432,12 @@ export function LandingPage() {
                     viewport={{ once: true }}
                     variants={fade}
                     transition={{ delay: (index % 4) * 0.04 }}
-                    whileHover={reduce ? undefined : { y: -4 }}
-                    className="rounded-2xl border border-ink/10 bg-paper p-4"
+                    whileHover={reduce ? undefined : { y: -5 }}
+                    className="group cursor-pointer rounded-2xl border border-ink/10 bg-paper p-4 transition-all duration-300 ease-out hover:border-ink hover:bg-ink hover:text-paper hover:shadow-xl hover:shadow-ink/15"
                   >
-                    <p className="font-mono text-[11px] text-slate">0{index + 1}</p>
-                    <h4 className="mt-2 font-medium">{title}</h4>
-                    <p className="mt-2 text-sm leading-6 text-slate">{body}</p>
+                    <p className="font-mono text-[11px] text-slate transition-colors duration-300 group-hover:text-mist">0{index + 1}</p>
+                    <h4 className="mt-2 font-medium text-ink transition-colors duration-300 group-hover:text-paper">{title}</h4>
+                    <p className="mt-2 text-sm leading-6 text-slate transition-colors duration-300 group-hover:text-line">{body}</p>
                   </motion.div>
                 ))}
               </div>
@@ -449,11 +453,16 @@ export function LandingPage() {
           />
           <div className="mt-12 grid gap-px overflow-hidden rounded-[28px] border border-ink/10 bg-ink/10 sm:grid-cols-2 lg:grid-cols-3">
             {guarantees.map((item) => (
-              <article key={item.n} className="bg-paper p-6">
-                <p className="font-serif text-3xl text-rust">{item.n}</p>
-                <h3 className="mt-3 text-lg">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate">{item.body}</p>
-              </article>
+              <motion.article
+                key={item.n}
+                whileHover={reduce ? undefined : { scale: 1.015, zIndex: 10 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="group relative bg-paper p-6 transition-all duration-300 ease-out hover:bg-ink hover:text-paper hover:shadow-2xl hover:shadow-ink/20"
+              >
+                <p className="font-serif text-3xl text-rust transition-colors duration-300 group-hover:text-mist">{item.n}</p>
+                <h3 className="mt-3 text-lg font-medium text-ink transition-colors duration-300 group-hover:text-paper">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate transition-colors duration-300 group-hover:text-line">{item.body}</p>
+              </motion.article>
             ))}
           </div>
           <p className="mt-6 max-w-3xl text-sm leading-6 text-slate">
@@ -463,25 +472,30 @@ export function LandingPage() {
         </section>
 
         <section id="stack" className="mx-auto max-w-6xl px-5 pb-24">
-          <SectionIntro kicker="Technology" title="A small stack, chosen so the hard parts stay boring." />
+          <SectionIntro kicker="Technology" title="A small stack, chosen so the hard parts stay light." />
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
             {categories.map((category) => (
-              <div key={category.title} className="rounded-[28px] border border-ink/10 bg-paper/75 p-6">
-                <h3 className="font-serif text-3xl">{category.title}</h3>
-                <dl className="mt-5 divide-y divide-ink/10">
+              <motion.div
+                key={category.title}
+                whileHover={reduce ? undefined : { y: -6 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="group rounded-[28px] border border-ink/10 bg-paper/75 p-6 transition-all duration-300 ease-out hover:border-ink hover:bg-ink hover:text-paper hover:shadow-2xl hover:shadow-ink/20"
+              >
+                <h3 className="font-serif text-3xl text-ink transition-colors duration-300 group-hover:text-paper">{category.title}</h3>
+                <dl className="mt-5 divide-y divide-ink/10 transition-colors duration-300 group-hover:divide-paper/10">
                   {category.rows.map(([name, role]) => (
                     <div key={name} className="flex items-baseline justify-between gap-4 py-3">
-                      <dt className="font-medium">{name}</dt>
-                      <dd className="text-right text-sm text-slate">{role}</dd>
+                      <dt className="font-medium text-ink transition-colors duration-300 group-hover:text-paper">{name}</dt>
+                      <dd className="text-right text-sm text-slate transition-colors duration-300 group-hover:text-line">{role}</dd>
                     </div>
                   ))}
                 </dl>
-              </div>
+              </motion.div>
             ))}
           </div>
-          <p className="mt-6 text-sm text-slate">
+          {/* <p className="mt-6 text-sm text-slate">
             Later, not now: IndexedDB, more adapters, Protocol Buffers, Kubernetes, and a hosted Hecate Cloud.
-          </p>
+          </p> */}
         </section>
 
         <section id="roadmap" className="border-t border-ink/10">
@@ -492,15 +506,26 @@ export function LandingPage() {
             />
             <ol className="mt-12 grid gap-3 md:grid-cols-2">
               {phases.map(([n, title, body]) => (
-                <li key={n} className="flex gap-4 rounded-2xl border border-ink/10 bg-paper/70 p-4">
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-mono text-sm ${n === "7" ? "bg-paper text-bark ring-1 ring-rust" : "bg-ink text-paper"}`}>
+                <motion.li
+                  key={n}
+                  whileHover={reduce ? undefined : { y: -4, scale: 1.01 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="group flex gap-4 rounded-2xl border border-ink/10 bg-paper/70 p-4 transition-all duration-300 ease-out hover:border-ink hover:bg-ink hover:text-paper hover:shadow-xl hover:shadow-ink/15"
+                >
+                  <span
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-mono text-sm transition-all duration-300 ${
+                      n === "7"
+                        ? "bg-paper text-bark ring-1 ring-rust group-hover:bg-rust group-hover:text-paper group-hover:ring-rust"
+                        : "bg-ink text-paper group-hover:bg-paper group-hover:text-ink"
+                    }`}
+                  >
                     {n}
                   </span>
                   <div>
-                    <h3 className="font-medium">{title}</h3>
-                    <p className="mt-1 text-sm leading-6 text-slate">{body}</p>
+                    <h3 className="font-medium text-ink transition-colors duration-300 group-hover:text-paper">{title}</h3>
+                    <p className="mt-1 text-sm leading-6 text-slate transition-colors duration-300 group-hover:text-line">{body}</p>
                   </div>
-                </li>
+                </motion.li>
               ))}
             </ol>
           </div>
@@ -520,7 +545,9 @@ export function LandingPage() {
                   whileInView="show"
                   viewport={{ once: true, margin: "-20px" }}
                   variants={fade}
-                  className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5"
+                  whileHover={reduce ? undefined : { y: -4 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="group relative overflow-hidden rounded-2xl border border-line/20 bg-ink/60 p-5 transition-all duration-300 ease-out hover:border-line/40 hover:bg-ink hover:shadow-2xl hover:shadow-ink/50"
                 >
                   <div className="absolute inset-x-0 top-0 h-[2px] overflow-hidden" aria-hidden>
                     <svg className="h-full w-full" preserveAspectRatio="none">
@@ -532,14 +559,14 @@ export function LandingPage() {
                         stroke="#e7b5a2"
                         strokeWidth="2"
                         strokeDasharray="6 24"
-                        className="dash-flow-fast"
+                        className="dash-flow-fast transition-opacity duration-300 group-hover:opacity-100"
                         opacity="0.45"
                       />
                     </svg>
                   </div>
-                  <p className="font-mono text-xs text-[#e7b5a2]">{String(index + 1).padStart(2, "0")}</p>
-                  <h3 className="mt-2 font-serif text-2xl">{title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-[#bcbcc3]">{body}</p>
+                  <p className="font-mono text-xs text-mist">{String(index + 1).padStart(2, "0")}</p>
+                  <h3 className="mt-2 font-serif text-2xl text-paper transition-colors duration-300">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-line transition-colors duration-300 group-hover:text-mist">{body}</p>
                 </motion.li>
               ))}
             </ol>
@@ -590,10 +617,10 @@ export function LandingPage() {
               Put sync in the infrastructure. Leave the product code to the product.
             </h2>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#capabilities" className="rounded-full bg-rust px-5 py-3 text-sm text-paper hover:bg-bark">
+              <a href="#capabilities" className="rounded-full bg-rust px-5 py-3 text-sm text-paper transition duration-300 ease-out hover:bg-bark">
                 Read Local Sync
               </a>
-              <a href="#architecture" className="rounded-full border border-ink px-5 py-3 text-sm hover:bg-ink hover:text-paper">
+              <a href="#architecture" className="rounded-full border border-ink px-5 py-3 text-sm transition duration-300 ease-out hover:bg-ink hover:text-paper">
                 Inspect the runtime
               </a>
             </div>
@@ -640,10 +667,14 @@ function FlowCard({ label, steps, note }: { label: string; steps: string[]; note
   const reduce = useReducedMotion();
 
   return (
-    <article className="rounded-[28px] border border-ink/10 bg-paper p-6">
+    <motion.article
+      whileHover={reduce ? undefined : { y: -6 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="group/card rounded-[28px] border border-ink/10 bg-paper p-6 transition-all duration-300 ease-out hover:border-ink hover:bg-ink hover:text-paper hover:shadow-2xl hover:shadow-ink/25"
+    >
       <div className="flex items-center justify-between">
-        <h3 className="font-serif text-3xl">{label}</h3>
-        <span className="flex items-center gap-1.5 font-mono text-[11px] text-rust uppercase tracking-wider">
+        <h3 className="font-serif text-3xl text-ink transition-colors duration-300 group-hover/card:text-paper">{label}</h3>
+        <span className="flex items-center gap-1.5 font-mono text-[11px] text-rust uppercase tracking-wider transition-colors duration-300 group-hover/card:text-mist">
           <span className="h-1.5 w-1.5 rounded-full bg-rust" />
           Pipeline
         </span>
@@ -661,6 +692,7 @@ function FlowCard({ label, steps, note }: { label: string; steps: string[]; note
               strokeWidth="1.5"
               strokeOpacity="0.12"
               strokeDasharray="3 4"
+              className="transition-colors duration-300 group-hover/card:stroke-paper/20"
             />
             <line
               x1="1"
@@ -690,11 +722,11 @@ function FlowCard({ label, steps, note }: { label: string; steps: string[]; note
 
         <ol className="relative space-y-3 pl-0">
           {steps.map((step, index) => (
-            <li key={step} className="group relative flex items-center gap-3">
-              <span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/20 bg-paper font-mono text-[11px] transition-colors group-hover:border-rust group-hover:text-rust shadow-xs">
+            <li key={step} className="group/step relative flex items-center gap-3">
+              <span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/20 bg-paper font-mono text-[11px] text-ink transition-all duration-300 group-hover/card:bg-ink group-hover/card:border-paper/20 group-hover/card:text-paper group-hover/step:border-rust group-hover/step:text-rust shadow-xs">
                 {index + 1}
               </span>
-              <span className="flex-1 rounded-full border border-ink/10 bg-[#f7f6f3] px-4 py-2 text-sm transition-all group-hover:border-ink/30 group-hover:bg-white">
+              <span className="flex-1 rounded-full border border-ink/10 bg-[#f7f6f3] px-4 py-2 text-sm text-ink transition-all duration-300 group-hover/card:bg-paper/10 group-hover/card:border-paper/15 group-hover/card:text-mist group-hover/step:border-rust/40">
                 {step}
               </span>
               {index < steps.length - 1 ? <span className="sr-only">then</span> : null}
@@ -702,8 +734,8 @@ function FlowCard({ label, steps, note }: { label: string; steps: string[]; note
           ))}
         </ol>
       </div>
-      <p className="mt-5 text-sm leading-6 text-slate">{note}</p>
-    </article>
+      <p className="mt-5 text-sm leading-6 text-slate transition-colors duration-300 group-hover/card:text-line">{note}</p>
+    </motion.article>
   );
 }
 
