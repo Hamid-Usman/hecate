@@ -1,26 +1,142 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f3f0;
+  --foreground: #1c1b1c;
+  --paper: #f4f3f0;
+  --ink: #1c1b1c;
+  --mist: #edeeef;
+  --line: #bcbcc3;
+  --slate: #515159;
+  --rust: #a14c32;
+  --bark: #502a11;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-mist: var(--mist);
+  --color-line: var(--line);
+  --color-slate: var(--slate);
+  --color-rust: var(--rust);
+  --color-bark: var(--bark);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument), ui-serif, georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #a14c32;
+  color: #f4f3f0;
+}
+
+.blueprint {
+  background-color: #f4f3f0;
+  background-image:
+    linear-gradient(to right, rgba(28, 27, 28, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(28, 27, 28, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.blueprint-dark {
+  background-color: #1c1b1c;
+  background-image:
+    linear-gradient(to right, rgba(237, 238, 239, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(237, 238, 239, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.dash-flow {
+  stroke-dasharray: 5 7;
+  animation: dash 18s linear infinite;
+}
+
+.dash-flow-fast {
+  stroke-dasharray: 6 8;
+  animation: dash 6s linear infinite;
+}
+
+.dash-flow-reverse {
+  stroke-dasharray: 6 8;
+  animation: dash-reverse 7s linear infinite;
+}
+
+.stroke-pulse-glow {
+  animation: stroke-pulse-kf 3s ease-in-out infinite;
+}
+
+.stroke-flow-sync {
+  stroke-dasharray: 4 6;
+  animation: dash 4s linear infinite;
+}
+
+.stroke-packet-travel {
+  stroke-dasharray: 8 40;
+  animation: dash 3.5s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -240;
+  }
+}
+
+@keyframes dash-reverse {
+  to {
+    stroke-dashoffset: 240;
+  }
+}
+
+@keyframes stroke-pulse-kf {
+  0%, 100% {
+    stroke-opacity: 0.25;
+  }
+  50% {
+    stroke-opacity: 0.85;
+  }
+}
+
+@keyframes stroke-radar {
+  0% {
+    r: 2px;
+    opacity: 0.9;
+    stroke-width: 1.5px;
+  }
+  100% {
+    r: 14px;
+    opacity: 0;
+    stroke-width: 0.5px;
+  }
+}
+
+.stroke-radar-ring {
+  animation: stroke-radar 2.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .dash-flow,
+  .dash-flow-fast,
+  .dash-flow-reverse,
+  .stroke-pulse-glow,
+  .stroke-flow-sync,
+  .stroke-packet-travel,
+  .stroke-radar-ring {
+    animation: none;
+  }
 }
