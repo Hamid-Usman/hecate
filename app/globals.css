@@ -10,9 +10,15 @@
   --slate: #515159;
   --rust: #a14c32;
   --bark: #502a11;
+  --ok: #3f6b4f;
+  --warn: #8f6412;
+  --bad: #9b2c2c;
 }
 
 @theme inline {
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-paper: var(--paper);
