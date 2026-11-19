@@ -4,6 +4,7 @@ import { ApiKeysPanel } from "@/components/projects/api-keys-panel";
 import { ProjectData, type ProjectParams } from "@/components/projects/project-data";
 import { CodeBlock } from "@/components/ui/copy";
 import { Section, Skeleton } from "@/components/ui/primitives";
+import { engineUrl } from "@/lib/config";
 
 export const metadata: Metadata = { title: "API keys — Hecate" };
 
@@ -19,7 +20,7 @@ export default function ApiKeysPage({ params }: { params: ProjectParams }) {
             <Section title="Using a key" description="Call this from your server when a user signs in to your app, then pass the token to the device.">
               <CodeBlock
                 title="POST /v1/tokens"
-                code={`curl -X POST https://YOUR-ENGINE/v1/tokens \\
+                code={`curl -X POST ${engineUrl()}/v1/tokens \\
   -H "Authorization: Bearer hsk.…" \\
   -H "Content-Type: application/json" \\
   -d '{

@@ -4,10 +4,12 @@ import { useState, type ReactNode } from "react";
 import { Button } from "./button";
 import { Dialog } from "./dialog";
 import { Input } from "./form";
+import { Callout } from "./primitives";
 
 /**
  * Confirmation for actions that cannot be undone. With `phrase` set, the button stays disabled until
- * the person types it, so a reflex click cannot destroy anything.
+ * the person types it, so a reflex click cannot destroy anything. If `onConfirm` throws, the dialog
+ * stays open and shows the message.
  */
 export function ConfirmDialog({
   open,
@@ -30,11 +32,13 @@ export function ConfirmDialog({
 }) {
   const [typed, setTyped] = useState("");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const ready = !phrase || typed === phrase;
 
   const close = () => {
     if (busy) return;
     setTyped("");
+    setError(null);
     onClose();
   };
 
@@ -55,10 +59,13 @@ export function ConfirmDialog({
             loading={busy}
             onClick={async () => {
               setBusy(true);
+              setError(null);
               try {
                 await onConfirm();
                 setTyped("");
                 onClose();
+              } catch (e) {
+                setError((e as Error).message || "Something went wrong. Please try again.");
               } finally {
                 setBusy(false);
               }
@@ -70,6 +77,7 @@ export function ConfirmDialog({
       }
     >
       <div className="space-y-4 text-sm leading-relaxed text-slate">
+        {error ? <Callout tone="danger">{error}</Callout> : null}
         <div>{body}</div>
         {phrase ? (
           <label className="block space-y-1.5">

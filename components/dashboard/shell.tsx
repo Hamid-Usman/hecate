@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useRef, useState } from "react";
 import { Mark } from "@/components/landing/glyphs";
+import { logout } from "@/lib/actions";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { Skeleton } from "@/components/ui/primitives";
 import { ToastProvider } from "@/components/ui/toast";
@@ -144,9 +145,11 @@ function SidebarContent({ me, projects, onNavigate, onClose }: { me: Me; project
             <p className="truncate text-[13px] font-medium">{me.user.name ?? me.user.email}</p>
             <p className="truncate text-xs text-slate">{me.user.email}</p>
           </div>
-          <Link href="/login" aria-label="Sign out" title="Sign out" className="rounded-full p-2 text-slate transition hover:bg-ink/5 hover:text-ink">
-            <Icon name="logout" />
-          </Link>
+          <form action={logout}>
+            <button type="submit" aria-label="Sign out" title="Sign out" className="rounded-full p-2 text-slate transition hover:bg-ink/5 hover:text-ink">
+              <Icon name="logout" />
+            </button>
+          </form>
         </div>
       </div>
     </div>

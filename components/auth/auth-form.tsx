@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { ApiError, login, register } from "@/lib/actions";
+import { login, register } from "@/lib/actions";
+import { ApiError, unwrap } from "@/lib/errors";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/form";
 import { Callout } from "@/components/ui/primitives";
@@ -27,7 +28,7 @@ const copy = {
   },
 } as const;
 
-export function AuthForm({ mode }: { mode: Mode }) {
+export function AuthForm({ mode, notice }: { mode: Mode; notice?: string }) {
   const router = useRouter();
   const c = copy[mode];
   const [values, setValues] = useState({ name: "", email: "", password: "" });
@@ -51,15 +52,17 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
     setBusy(true);
     try {
-      if (mode === "login") await login(values.email.trim(), values.password);
-      else await register({ email: values.email.trim(), password: values.password, name: values.name.trim() || undefined });
+      if (mode === "login") unwrap(await login(values.email.trim(), values.password));
+      else unwrap(await register({ email: values.email.trim(), password: values.password, name: values.name.trim() || undefined }));
       router.push("/projects");
+      router.refresh();
     } catch (err) {
       const e = err as ApiError;
       if (e.status === 409) setErrors({ email: "That email is already registered. Try signing in instead." });
       else if (e.status === 429) setErrors({ form: "Too many failed attempts. Try again in 15 minutes." });
       else if (e.status === 401) setErrors({ form: "Wrong email or password." });
-      else setErrors({ form: "Something went wrong on our side. Please try again." });
+      else if (e.status === 400) setErrors({ form: e.message });
+      else setErrors({ form: e.message || "Something went wrong on our side. Please try again." });
       setBusy(false);
     }
   }
@@ -71,6 +74,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       <p className="mt-2 text-[15px] text-slate">{c.lead}</p>
 
       <form onSubmit={submit} noValidate className="mt-8 space-y-5">
+        {notice && !errors.form ? <Callout>{notice}</Callout> : null}
         {errors.form ? <Callout tone="danger">{errors.form}</Callout> : null}
 
         {mode === "register" ? (

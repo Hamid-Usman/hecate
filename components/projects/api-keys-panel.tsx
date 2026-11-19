@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { createApiKey, revokeApiKey } from "@/lib/actions";
+import { unwrap } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 import type { ApiKey } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -62,7 +63,7 @@ export function ApiKeysPanel({ projectId, initial, readOnly }: { projectId: stri
         open={creating}
         projectId={projectId}
         onClose={() => setCreating(false)}
-        onCreated={(k) => setKeys((l) => [{ id: k.id, label: k.label, revoked: false, createdAt: "2026-11-19T06:30:00.000Z" }, ...l])}
+        onCreated={(k) => setKeys((l) => [{ id: k.id, label: k.label, revoked: false, createdAt: new Date().toISOString() }, ...l])}
       />
 
       <ConfirmDialog
@@ -80,7 +81,7 @@ export function ApiKeysPanel({ projectId, initial, readOnly }: { projectId: stri
         }
         onConfirm={async () => {
           const target = revoking!;
-          await revokeApiKey(target.id);
+          unwrap(await revokeApiKey(projectId, target.id));
           setKeys((l) => l.map((k) => (k.id === target.id ? { ...k, revoked: true } : k)));
           toast("API key revoked. The engine stopped accepting it.");
         }}
@@ -109,11 +110,11 @@ function CreateKeyDialog({ open, projectId, onClose, onCreated }: { open: boolea
     setBusy(true);
     setError(null);
     try {
-      const k = await createApiKey(projectId, label.trim());
+      const k = unwrap(await createApiKey(projectId, label.trim()));
       setCreated({ key: k.key, label: k.label });
       onCreated({ id: k.id, label: k.label });
-    } catch {
-      setError("Couldn’t create the key. Please try again.");
+    } catch (e) {
+      setError((e as Error).message || "Couldn’t create the key. Please try again.");
     } finally {
       setBusy(false);
     }

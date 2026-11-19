@@ -6,6 +6,7 @@ import { AuditList } from "@/components/projects/audit-list";
 import { ProjectData, type ProjectParams } from "@/components/projects/project-data";
 import { SetupChecklist } from "@/components/projects/setup-checklist";
 import { Card, Section, Skeleton, StatTile } from "@/components/ui/primitives";
+import { engineUrl } from "@/lib/config";
 import { getAudit, getMe, getUsage } from "@/lib/data";
 import { formatNumber } from "@/lib/format";
 
@@ -51,7 +52,7 @@ export default function OverviewPage({ params }: { params: ProjectParams }) {
               </Section>
 
               <div className="grid gap-8 lg:grid-cols-[3fr_2fr]">
-                <SetupChecklist project={project} />
+                <SetupChecklist project={project} engine={engineUrl()} />
                 <Section
                   title="Recent activity"
                   action={

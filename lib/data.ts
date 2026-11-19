@@ -1,58 +1,50 @@
-/**
- * Reads for the dashboard. MOCK DATA for now: each function matches an endpoint of hecates-backend
- * (named in its comment), so integration means replacing these bodies with fetch calls.
- */
-import { PROJECT_ID_PATTERN } from "./format";
-import { mockAudit, mockMe, mockProjects, mockUsage } from "./mock";
+import "server-only";
+import { connection } from "next/server";
+import { fetchProject, fetchProjects, fetchMe } from "./api/projects";
+import { fetchAudit, fetchUsage } from "./api/reports";
+import { ApiError } from "./errors";
 import type { AuditEntry, Me, Project, ProjectDetail, UsageDay } from "./types";
 
-/** GET /v1/me */
+/** The signed-in user and their accounts. */
 export async function getMe(): Promise<Me> {
-  return mockMe;
+  return fetchMe();
 }
 
-/** GET /v1/accounts/:id/projects */
 export async function listProjects(accountId: string): Promise<Project[]> {
-  return mockProjects.filter((p) => p.accountId === accountId);
+  return fetchProjects(accountId);
 }
 
-/** Every project across the user's accounts (the dashboard's "all projects" view calls the endpoint above once per account). */
+/** The projects of every account the user belongs to, for the sidebar. */
 export async function listAllProjects(): Promise<Project[]> {
-  return mockProjects;
+  const me = await fetchMe();
+  return (await Promise.all(me.accounts.map((a) => fetchProjects(a.id)))).flat();
+}
+
+/** Null when the backend answers 404 (missing, or in someone else's account) or the id is malformed. */
+export async function getProject(id: string): Promise<ProjectDetail | null> {
+  try {
+    return await fetchProject(id);
+  } catch (e) {
+    if (e instanceof ApiError && (e.status === 404 || e.status === 400)) return null;
+    throw e;
+  }
 }
 
 /**
- * GET /v1/projects/:id. Resolves to null for "404 not found".
- *
- * Mock only: since nothing is stored yet, any other well-formed id opens as a brand-new development
- * project (so a project you just "created" can be opened). Ids starting with "missing" give the 404.
+ * The backend lists only days that had activity; this fills the gaps with zeros so charts show
+ * real time, newest day first.
  */
-export async function getProject(id: string): Promise<ProjectDetail | null> {
-  const known = mockProjects.find((p) => p.id === id);
-  if (known) return known;
-  if (!PROJECT_ID_PATTERN.test(id) || id.startsWith("missing")) return null;
-  return {
-    id,
-    accountId: mockMe.accounts[0]!.id,
-    name: id.replace(/-3fa9$/, "").replace(/[-_]+/g, " ").replace(/^./, (c) => c.toUpperCase()),
-    environment: "development",
-    status: "active",
-    policy: "",
-    rules: null,
-    limits: {},
-    createdAt: "2026-11-19T06:30:00.000Z",
-    role: "owner",
-    signingKeys: [{ kid: "k1", revoked: false, createdAt: "2026-11-19T06:30:00.000Z" }],
-    apiKeys: [],
-  };
-}
-
-/** GET /v1/projects/:id/usage?days= */
 export async function getUsage(id: string, days = 30): Promise<UsageDay[]> {
-  return mockUsage(id, days);
+  const rows = await fetchUsage(id, days);
+  await connection(); // "today" is request time
+  const byDay = new Map(rows.map((r) => [r.day, r]));
+  const today = new Date();
+  return Array.from({ length: days }, (_, i) => {
+    const day = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - i)).toISOString().slice(0, 10);
+    return byDay.get(day) ?? { day, eventsApplied: 0, pushes: 0 };
+  });
 }
 
-/** GET /v1/projects/:id/audit */
 export async function getAudit(id: string): Promise<AuditEntry[]> {
-  return mockAudit(id);
+  return fetchAudit(id);
 }

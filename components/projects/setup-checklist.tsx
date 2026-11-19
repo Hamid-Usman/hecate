@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/primitives";
 import type { ProjectDetail } from "@/lib/types";
 
 /** The path from an empty project to a syncing device, with what is already done ticked off. */
-export function SetupChecklist({ project }: { project: ProjectDetail }) {
+export function SetupChecklist({ project, engine }: { project: ProjectDetail; engine: string }) {
   const base = `/projects/${project.id}`;
   const hasKey = project.apiKeys.some((k) => !k.revoked);
   const steps = [
@@ -51,11 +51,11 @@ export function SetupChecklist({ project }: { project: ProjectDetail }) {
 
       <div className="space-y-3 border-t border-ink/10 bg-mist/40 p-6">
         <p className="text-sm text-slate">
-          Then, from your server, trade the API key for a device token and hand it to the app:
+          Then, from your server, trade the API key for a device token and hand it to the app. The <Link href={`${base}/connect`} className="underline underline-offset-4 hover:text-ink">Connect guide</Link> has the full code for your server and app.
         </p>
         <CodeBlock
           title="your server"
-          code={`curl -X POST https://YOUR-ENGINE/v1/tokens \\
+          code={`curl -X POST ${engine}/v1/tokens \\
   -H "Authorization: Bearer <your API key>" \\
   -H "Content-Type: application/json" \\
   -d '{ "device_id": "device-123", "user_id": "user-42" }'`}

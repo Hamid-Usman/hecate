@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { ApiError, createProject } from "@/lib/actions";
+import { createProject } from "@/lib/actions";
+import { ApiError, unwrap } from "@/lib/errors";
 import { PROJECT_ID_PATTERN, slugify } from "@/lib/format";
 import type { Environment, Project } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -41,14 +42,16 @@ export function CreateProjectDialog({ open, onClose, accountId, onCreated }: { o
 
     setBusy(true);
     try {
-      const project = await createProject(accountId, { name: name.trim(), id: effectiveId || undefined, environment });
+      const project = unwrap(await createProject(accountId, { name: name.trim(), id: effectiveId || undefined, environment }));
       reset();
       onCreated(project);
       onClose();
     } catch (err) {
       const e = err as ApiError;
       if (e.status === 409) setErrors({ id: "That project id is already taken. Pick another." });
-      else setErrors({ form: "Couldn’t create the project. Please try again." });
+      else if (e.status === 400) setErrors({ form: e.message });
+      else if (e.status === 403) setErrors({ form: "Only owners and admins can create projects in this account." });
+      else setErrors({ form: e.message || "Couldn’t create the project. Please try again." });
     } finally {
       setBusy(false);
     }

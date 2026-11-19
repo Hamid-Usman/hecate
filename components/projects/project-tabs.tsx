@@ -6,6 +6,7 @@ import { Icon, type IconName } from "@/components/ui/icons";
 
 const tabs: { slug: string; label: string; icon: IconName }[] = [
   { slug: "", label: "Overview", icon: "overview" },
+  { slug: "connect", label: "Connect", icon: "sync" },
   { slug: "api-keys", label: "API keys", icon: "key" },
   { slug: "signing-keys", label: "Signing keys", icon: "shield" },
   { slug: "rules", label: "Rules", icon: "rules" },

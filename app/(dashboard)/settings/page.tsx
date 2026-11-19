@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
-import { ButtonLink } from "@/components/ui/button";
-import { Badge, Card, PageHeader, Section } from "@/components/ui/primitives";
+import { Suspense } from "react";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { Badge, Card, PageHeader, Section, Skeleton } from "@/components/ui/primitives";
+import { logout } from "@/lib/actions";
 import { getMe } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Account — Hecate" };
 
-export default async function AccountPage() {
+export default function AccountPage() {
+  return (
+    <Suspense fallback={<Skeleton className="h-[32rem]" />}>
+      <Account />
+    </Suspense>
+  );
+}
+
+async function Account() {
   const me = await getMe();
 
   return (
@@ -40,9 +50,11 @@ export default async function AccountPage() {
       <Section title="Session">
         <Card className="flex flex-wrap items-center justify-between gap-4 p-6">
           <p className="max-w-md text-sm text-slate">Signing out ends this session on this device. Your projects and keys are not affected.</p>
-          <ButtonLink href="/login" variant="secondary" icon="logout">
-            Sign out
-          </ButtonLink>
+          <form action={logout}>
+            <Button type="submit" variant="secondary" icon="logout">
+              Sign out
+            </Button>
+          </form>
         </Card>
       </Section>
     </div>

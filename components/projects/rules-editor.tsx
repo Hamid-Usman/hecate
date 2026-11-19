@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { patchProject } from "@/lib/actions";
+import { unwrap } from "@/lib/errors";
 import type { Rules } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { CodeBlock } from "@/components/ui/copy";
@@ -22,7 +23,7 @@ const toRules = (scope: Scope, rows: Row[]): Rules | null =>
     ? null
     : { tables: Object.fromEntries(rows.map((r) => [r.table.trim(), { ...(r.tenant.trim() && { tenant_column: r.tenant.trim() }), ...(r.user.trim() && { user_column: r.user.trim() }) }])) };
 
-export function RulesEditor({ initial, readOnly }: { initial: Rules | null; readOnly: boolean }) {
+export function RulesEditor({ projectId, initial, readOnly }: { projectId: string; initial: Rules | null; readOnly: boolean }) {
   const { toast } = useToast();
   const [saved, setSaved] = useState(initial);
   const [scope, setScope] = useState<Scope>(initial ? "some" : "all");
@@ -65,12 +66,12 @@ export function RulesEditor({ initial, readOnly }: { initial: Rules | null; read
     if (invalid) return;
     setBusy(true);
     try {
-      await patchProject("", { rules: current });
+      unwrap(await patchProject(projectId, { rules: current }));
       setSaved(current);
       setShowErrors(false);
       toast("Rules saved and sent to the engine.");
-    } catch {
-      toast("Couldn’t save the rules. Please try again.", "error");
+    } catch (e) {
+      toast((e as Error).message || "Couldn’t save the rules. Please try again.", "error");
     } finally {
       setBusy(false);
     }

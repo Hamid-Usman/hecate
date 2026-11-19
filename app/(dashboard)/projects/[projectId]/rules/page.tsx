@@ -12,7 +12,7 @@ export default function RulesPage({ params }: { params: ProjectParams }) {
       <ProjectData params={params}>
         {(p) => (
           <Section title="Sync rules" description="Choose which tables sync, and keep each device to the rows it is allowed to see. Changes reach the engine immediately.">
-            <RulesEditor key={JSON.stringify(p.rules)} initial={p.rules} readOnly={p.role === "member"} />
+            <RulesEditor key={JSON.stringify(p.rules)} projectId={p.id} initial={p.rules} readOnly={p.role === "member"} />
           </Section>
         )}
       </ProjectData>

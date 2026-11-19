@@ -12,7 +12,7 @@ export default function SigningKeysPage({ params }: { params: ProjectParams }) {
       <ProjectData params={params}>
         {(p) => (
           <Section title="Signing keys" description="The secrets Hecate uses to sign and check device tokens. You never see them; you only rotate and revoke.">
-            <SigningKeysPanel initial={p.signingKeys} readOnly={p.role === "member"} />
+            <SigningKeysPanel projectId={p.id} initial={p.signingKeys} readOnly={p.role === "member"} />
           </Section>
         )}
       </ProjectData>

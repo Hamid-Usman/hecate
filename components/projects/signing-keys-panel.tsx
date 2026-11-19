@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { revokeSigningKey, rotateSigningKey } from "@/lib/actions";
+import { unwrap } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 import type { SigningKey } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { ConfirmDialog } from "@/components/ui/confirm";
 import { Badge, Callout, Card, Mono } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
 
-export function SigningKeysPanel({ initial, readOnly }: { initial: SigningKey[]; readOnly: boolean }) {
+export function SigningKeysPanel({ projectId, initial, readOnly }: { projectId: string; initial: SigningKey[]; readOnly: boolean }) {
   const { toast } = useToast();
   const [keys, setKeys] = useState(initial);
   const [rotating, setRotating] = useState(false);
@@ -74,9 +75,9 @@ export function SigningKeysPanel({ initial, readOnly }: { initial: SigningKey[];
           </p>
         }
         onConfirm={async () => {
-          await rotateSigningKey(nextKid);
-          setKeys((l) => [{ kid: nextKid, revoked: false, createdAt: "2026-11-19T06:30:00.000Z" }, ...l]);
-          toast(`Signing key ${nextKid} is now in use.`);
+          const { kid } = unwrap(await rotateSigningKey(projectId));
+          setKeys((l) => [{ kid, revoked: false, createdAt: new Date().toISOString() }, ...l]);
+          toast(`Signing key ${kid} is now in use.`);
         }}
       />
 
@@ -96,7 +97,7 @@ export function SigningKeysPanel({ initial, readOnly }: { initial: SigningKey[];
         }
         onConfirm={async () => {
           const target = revoking!;
-          await revokeSigningKey(target.kid);
+          unwrap(await revokeSigningKey(projectId, target.kid));
           setKeys((l) => l.map((k) => (k.kid === target.kid ? { ...k, revoked: true } : k)));
           toast(`Signing key ${target.kid} revoked.`);
         }}

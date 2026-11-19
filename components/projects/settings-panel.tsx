@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { deleteProject, patchProject } from "@/lib/actions";
+import { unwrap } from "@/lib/errors";
 import { limitFields, policies, policyLabel } from "@/lib/meta";
 import type { ConflictPolicy, Limits, ProjectDetail } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -16,8 +17,8 @@ export function SettingsPanel({ project }: { project: ProjectDetail }) {
   return (
     <div className="space-y-12">
       <General project={project} readOnly={readOnly} />
-      <PolicySection initial={project.policy} readOnly={readOnly} />
-      <LimitsSection initial={project.limits} readOnly={readOnly} />
+      <PolicySection projectId={project.id} initial={project.policy} readOnly={readOnly} />
+      <LimitsSection projectId={project.id} initial={project.limits} readOnly={readOnly} />
       <DangerZone project={project} readOnly={readOnly} />
     </div>
   );
@@ -52,11 +53,11 @@ function General({ project, readOnly }: { project: ProjectDetail; readOnly: bool
     if (!name.trim()) return setError("The name can’t be empty.");
     setBusy(true);
     try {
-      await patchProject(project.id, { name: name.trim() });
+      unwrap(await patchProject(project.id, { name: name.trim() }));
       setSaved(name.trim());
       toast("Project renamed.");
-    } catch {
-      toast("Couldn’t save. Please try again.", "error");
+    } catch (e) {
+      toast((e as Error).message || "Couldn’t save. Please try again.", "error");
     } finally {
       setBusy(false);
     }
@@ -79,7 +80,7 @@ function General({ project, readOnly }: { project: ProjectDetail; readOnly: bool
   );
 }
 
-function PolicySection({ initial, readOnly }: { initial: ConflictPolicy; readOnly: boolean }) {
+function PolicySection({ projectId, initial, readOnly }: { projectId: string; initial: ConflictPolicy; readOnly: boolean }) {
   const { toast } = useToast();
   const [saved, setSaved] = useState(initial);
   const [value, setValue] = useState(initial);
@@ -89,11 +90,11 @@ function PolicySection({ initial, readOnly }: { initial: ConflictPolicy; readOnl
     e.preventDefault();
     setBusy(true);
     try {
-      await patchProject("", { policy: value });
+      unwrap(await patchProject(projectId, { policy: value }));
       setSaved(value);
       toast(`Conflicts now resolve as “${policyLabel(value)}”.`);
-    } catch {
-      toast("Couldn’t save. Please try again.", "error");
+    } catch (e) {
+      toast((e as Error).message || "Couldn’t save. Please try again.", "error");
     } finally {
       setBusy(false);
     }
@@ -118,7 +119,7 @@ function PolicySection({ initial, readOnly }: { initial: ConflictPolicy; readOnl
   );
 }
 
-function LimitsSection({ initial, readOnly }: { initial: Limits; readOnly: boolean }) {
+function LimitsSection({ projectId, initial, readOnly }: { projectId: string; initial: Limits; readOnly: boolean }) {
   const { toast } = useToast();
   const toText = (l: Limits) => Object.fromEntries(limitFields.map((f) => [f.key, l[f.key] === undefined ? "" : String(l[f.key])])) as Record<keyof Limits, string>;
   const [saved, setSaved] = useState(toText(initial));
@@ -144,11 +145,11 @@ function LimitsSection({ initial, readOnly }: { initial: Limits; readOnly: boole
 
     setBusy(true);
     try {
-      await patchProject("", { limits });
+      unwrap(await patchProject(projectId, { limits }));
       setSaved(values);
       toast("Limits saved and sent to the engine.");
-    } catch {
-      toast("Couldn’t save. Please try again.", "error");
+    } catch (e) {
+      toast((e as Error).message || "Couldn’t save. Please try again.", "error");
     } finally {
       setBusy(false);
     }
@@ -196,9 +197,11 @@ function DangerZone({ project, readOnly }: { project: ProjectDetail; readOnly: b
   async function resume() {
     setBusy(true);
     try {
-      await patchProject(project.id, { status: "active" });
+      unwrap(await patchProject(project.id, { status: "active" }));
       setStatus("active");
       toast("Project resumed. Devices will sync again.");
+    } catch (e) {
+      toast((e as Error).message || "Couldn’t resume the project.", "error");
     } finally {
       setBusy(false);
     }
@@ -247,7 +250,7 @@ function DangerZone({ project, readOnly }: { project: ProjectDetail; readOnly: b
         confirmLabel="Suspend"
         body={<p>Syncing stops for every device within a second. Devices keep working offline, and sync again as soon as you resume.</p>}
         onConfirm={async () => {
-          await patchProject(project.id, { status: "suspended" });
+          unwrap(await patchProject(project.id, { status: "suspended" }));
           setStatus("suspended");
           toast("Project suspended.");
         }}
@@ -267,7 +270,7 @@ function DangerZone({ project, readOnly }: { project: ProjectDetail; readOnly: b
           </>
         }
         onConfirm={async () => {
-          await deleteProject(project.id);
+          unwrap(await deleteProject(project.id));
           toast(`Project “${project.name}” deleted.`);
           router.push("/projects");
         }}
