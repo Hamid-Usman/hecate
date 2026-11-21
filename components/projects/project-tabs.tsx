@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { Icon, type IconName } from "@/components/ui/icons";
 
 const tabs: { slug: string; label: string; icon: IconName }[] = [
@@ -15,7 +15,8 @@ const tabs: { slug: string; label: string; icon: IconName }[] = [
   { slug: "settings", label: "Settings", icon: "settings" },
 ];
 
-export function ProjectTabs({ projectId }: { projectId: string }) {
+export function ProjectTabs() {
+  const { projectId } = useParams<{ projectId: string }>();
   const pathname = usePathname();
   const base = `/projects/${projectId}`;
 

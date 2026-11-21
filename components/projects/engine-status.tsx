@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { CopyButton } from "@/components/ui/copy";
 import { Badge, Card } from "@/components/ui/primitives";
 import { engineUrl } from "@/lib/config";
@@ -5,6 +6,7 @@ import { getEngineHealth } from "@/lib/engine";
 
 /** The engine address apps connect to, with a live reachability check. Render inside <Suspense>. */
 export async function EngineStatus() {
+  await connection(); // check at request time, never bake a build-time result into the page
   const url = engineUrl();
   const health = await getEngineHealth();
 

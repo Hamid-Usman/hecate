@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { patchProject } from "@/lib/actions";
-import { unwrap } from "@/lib/errors";
+import { usePatchProject } from "@/lib/queries";
 import type { Rules } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { CodeBlock } from "@/components/ui/copy";
@@ -29,7 +28,8 @@ export function RulesEditor({ projectId, initial, readOnly }: { projectId: strin
   const [scope, setScope] = useState<Scope>(initial ? "some" : "all");
   const [rows, setRows] = useState<Row[]>(toRows(initial));
   const [nextKey, setNextKey] = useState(100);
-  const [busy, setBusy] = useState(false);
+  const patch = usePatchProject(projectId);
+  const busy = patch.isPending;
   const [showErrors, setShowErrors] = useState(false);
 
   const errors = useMemo(() => {
@@ -64,16 +64,13 @@ export function RulesEditor({ projectId, initial, readOnly }: { projectId: strin
   async function save() {
     setShowErrors(true);
     if (invalid) return;
-    setBusy(true);
     try {
-      unwrap(await patchProject(projectId, { rules: current }));
+      await patch.mutateAsync({ rules: current });
       setSaved(current);
       setShowErrors(false);
       toast("Rules saved and sent to the engine.");
     } catch (e) {
       toast((e as Error).message || "Couldn’t save the rules. Please try again.", "error");
-    } finally {
-      setBusy(false);
     }
   }
 

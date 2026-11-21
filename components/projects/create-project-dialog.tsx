@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { createProject } from "@/lib/actions";
-import { ApiError, unwrap } from "@/lib/errors";
+import { ApiError } from "@/lib/errors";
+import { useCreateProject } from "@/lib/queries";
 import { PROJECT_ID_PATTERN, slugify } from "@/lib/format";
 import type { Environment, Project } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,8 @@ export function CreateProjectDialog({ open, onClose, accountId, onCreated }: { o
   const [idTouched, setIdTouched] = useState(false);
   const [environment, setEnvironment] = useState<Environment>("development");
   const [errors, setErrors] = useState<{ name?: string; id?: string; form?: string }>({});
-  const [busy, setBusy] = useState(false);
+  const create = useCreateProject(accountId);
+  const busy = create.isPending;
 
   const effectiveId = idTouched ? id : slugify(name);
 
@@ -40,9 +41,8 @@ export function CreateProjectDialog({ open, onClose, accountId, onCreated }: { o
     if (effectiveId && !PROJECT_ID_PATTERN.test(effectiveId)) next.id = "3–40 characters: lowercase letters, digits, “-” and “_”, starting with a letter or digit.";
     if (Object.keys(next).length) return setErrors(next);
 
-    setBusy(true);
     try {
-      const project = unwrap(await createProject(accountId, { name: name.trim(), id: effectiveId || undefined, environment }));
+      const project = await create.mutateAsync({ name: name.trim(), id: effectiveId || undefined, environment });
       reset();
       onCreated(project);
       onClose();
@@ -52,8 +52,6 @@ export function CreateProjectDialog({ open, onClose, accountId, onCreated }: { o
       else if (e.status === 400) setErrors({ form: e.message });
       else if (e.status === 403) setErrors({ form: "Only owners and admins can create projects in this account." });
       else setErrors({ form: e.message || "Couldn’t create the project. Please try again." });
-    } finally {
-      setBusy(false);
     }
   }
 
