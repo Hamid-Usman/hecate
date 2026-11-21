@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { revokeSigningKey, rotateSigningKey } from "@/lib/actions";
-import { unwrap } from "@/lib/errors";
+import { useRevokeSigningKey, useRotateSigningKey } from "@/lib/queries";
 import { formatDate } from "@/lib/format";
 import type { SigningKey } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -10,9 +9,11 @@ import { ConfirmDialog } from "@/components/ui/confirm";
 import { Badge, Callout, Card, Mono } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
 
-export function SigningKeysPanel({ projectId, initial, readOnly }: { projectId: string; initial: SigningKey[]; readOnly: boolean }) {
+/** `keys` comes from the cached project; rotating and revoking update that cache. */
+export function SigningKeysPanel({ projectId, keys, readOnly }: { projectId: string; keys: SigningKey[]; readOnly: boolean }) {
   const { toast } = useToast();
-  const [keys, setKeys] = useState(initial);
+  const rotate = useRotateSigningKey(projectId);
+  const revoke = useRevokeSigningKey(projectId);
   const [rotating, setRotating] = useState(false);
   const [revoking, setRevoking] = useState<SigningKey | null>(null);
 
@@ -75,8 +76,7 @@ export function SigningKeysPanel({ projectId, initial, readOnly }: { projectId: 
           </p>
         }
         onConfirm={async () => {
-          const { kid } = unwrap(await rotateSigningKey(projectId));
-          setKeys((l) => [{ kid, revoked: false, createdAt: new Date().toISOString() }, ...l]);
+          const { kid } = await rotate.mutateAsync();
           toast(`Signing key ${kid} is now in use.`);
         }}
       />
@@ -97,8 +97,7 @@ export function SigningKeysPanel({ projectId, initial, readOnly }: { projectId: 
         }
         onConfirm={async () => {
           const target = revoking!;
-          unwrap(await revokeSigningKey(projectId, target.kid));
-          setKeys((l) => l.map((k) => (k.kid === target.kid ? { ...k, revoked: true } : k)));
+          await revoke.mutateAsync(target.kid);
           toast(`Signing key ${target.kid} revoked.`);
         }}
       />

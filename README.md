@@ -7,6 +7,7 @@ per-tenant access, as infrastructure instead of application code.
 This repository has two parts:
 
 - **The landing page** at `/`, which explains the product.
+- **The Devlog** at `/devlog`, a quick introduction to integrating Hecate into an app.
 - **The dashboard**, where developers sign up, create projects, manage keys, rules and limits, watch
   usage, and get the code to connect their app.
 
@@ -37,6 +38,7 @@ Developers' apps talk to the engine directly, using the address the dashboard sh
 | `/projects/[id]/activity` | Audit trail of who changed what |
 | `/projects/[id]/settings` | Name, conflict policy, limits, suspend or resume, delete |
 | `/settings` | Your profile, your accounts and roles, sign out |
+| `/devlog` | Quick introduction to integrating Hecate into an app |
 
 Members of an account get read-only views; owners and admins can change things. Destructive actions
 (revoking a signing key, deleting a project) ask you to type the name to confirm.

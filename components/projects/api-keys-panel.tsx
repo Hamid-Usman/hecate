@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { createApiKey, revokeApiKey } from "@/lib/actions";
-import { unwrap } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
+import { useCreateApiKey, useRevokeApiKey } from "@/lib/queries";
 import type { ApiKey } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm";
@@ -13,9 +12,10 @@ import { Field, Input } from "@/components/ui/form";
 import { Badge, Callout, Card, EmptyState, Mono } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/toast";
 
-export function ApiKeysPanel({ projectId, initial, readOnly }: { projectId: string; initial: ApiKey[]; readOnly: boolean }) {
+/** `keys` comes from the cached project; creating and revoking update that cache. */
+export function ApiKeysPanel({ projectId, keys, readOnly }: { projectId: string; keys: ApiKey[]; readOnly: boolean }) {
   const { toast } = useToast();
-  const [keys, setKeys] = useState(initial);
+  const revoke = useRevokeApiKey(projectId);
   const [creating, setCreating] = useState(false);
   const [revoking, setRevoking] = useState<ApiKey | null>(null);
 
@@ -63,7 +63,6 @@ export function ApiKeysPanel({ projectId, initial, readOnly }: { projectId: stri
         open={creating}
         projectId={projectId}
         onClose={() => setCreating(false)}
-        onCreated={(k) => setKeys((l) => [{ id: k.id, label: k.label, revoked: false, createdAt: new Date().toISOString() }, ...l])}
       />
 
       <ConfirmDialog
@@ -81,8 +80,7 @@ export function ApiKeysPanel({ projectId, initial, readOnly }: { projectId: stri
         }
         onConfirm={async () => {
           const target = revoking!;
-          unwrap(await revokeApiKey(projectId, target.id));
-          setKeys((l) => l.map((k) => (k.id === target.id ? { ...k, revoked: true } : k)));
+          await revoke.mutateAsync(target.id);
           toast("API key revoked. The engine stopped accepting it.");
         }}
       />
@@ -90,9 +88,10 @@ export function ApiKeysPanel({ projectId, initial, readOnly }: { projectId: stri
   );
 }
 
-function CreateKeyDialog({ open, projectId, onClose, onCreated }: { open: boolean; projectId: string; onClose: () => void; onCreated: (k: { id: string; label: string }) => void }) {
+function CreateKeyDialog({ open, projectId, onClose }: { open: boolean; projectId: string; onClose: () => void }) {
   const [label, setLabel] = useState("");
-  const [busy, setBusy] = useState(false);
+  const create = useCreateApiKey(projectId);
+  const busy = create.isPending;
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<{ key: string; label: string } | null>(null);
   const [saved, setSaved] = useState(false);
@@ -107,16 +106,12 @@ function CreateKeyDialog({ open, projectId, onClose, onCreated }: { open: boolea
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    setBusy(true);
     setError(null);
     try {
-      const k = unwrap(await createApiKey(projectId, label.trim()));
+      const k = await create.mutateAsync(label.trim());
       setCreated({ key: k.key, label: k.label });
-      onCreated({ id: k.id, label: k.label });
     } catch (e) {
       setError((e as Error).message || "Couldn’t create the key. Please try again.");
-    } finally {
-      setBusy(false);
     }
   }
 

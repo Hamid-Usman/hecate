@@ -1,6 +1,6 @@
 /**
- * The shapes hecates-backend returns (see its src/responses.ts and /docs). Kept identical so wiring
- * the real API later only means replacing the bodies in lib/data.ts and lib/actions.ts.
+ * The shapes hecates-backend returns (see its src/responses.ts and /docs). Kept identical so the
+ * calls in lib/queries.ts are typed by them.
  */
 export type Role = "owner" | "admin" | "member";
 export type Environment = "development" | "production";

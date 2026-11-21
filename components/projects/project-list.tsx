@@ -18,9 +18,9 @@ const filters = [
   { value: "suspended", label: "Suspended" },
 ] as const;
 
-export function ProjectList({ initial, accountId, role }: { initial: Project[]; accountId: string; role: Role }) {
+/** `projects` comes from the cache; creating a project adds it there. */
+export function ProjectList({ projects, accountId, role }: { projects: Project[]; accountId: string; role: Role }) {
   const { toast } = useToast();
-  const [projects, setProjects] = useState(initial);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<(typeof filters)[number]["value"]>("all");
   const [creating, setCreating] = useState(false);
@@ -133,7 +133,6 @@ export function ProjectList({ initial, accountId, role }: { initial: Project[]; 
         onClose={() => setCreating(false)}
         accountId={accountId}
         onCreated={(p) => {
-          setProjects((list) => [p, ...list]);
           toast(`Project “${p.name}” created. Next: create an API key.`);
         }}
       />

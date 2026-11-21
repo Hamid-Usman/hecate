@@ -88,7 +88,7 @@ export function ConnectGuide({ project, engine }: { project: ProjectDetail; engi
             ["A device gets no rows", "Rows only reach devices whose token matches the row’s tenant or user column in your Rules. Check the tenant_id you put in the token."],
             ["Writes are refused", "The table isn’t in your Rules. Add it, or switch Rules to sync every table."],
             ["429 too many requests", "You hit a limit set under Settings → Limits. Raise it or slow the device’s sync rate."],
-            ["The engine is slow the first time", "Free hosting sleeps when idle and takes about 15 seconds to wake. The SDK retries on its own."],
+            ["The engine is slow the first time", "Hecate currently operates on free hosting services, which sleeps when idle and takes about 15 seconds to wake. The SDK retries on its own."],
           ].map(([q, a]) => (
             <div key={q} className="py-3">
               <dt className="font-medium">{q}</dt>

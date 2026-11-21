@@ -5,7 +5,7 @@ export function connectSnippets(project: ProjectDetail, engine: string) {
   const tables = Object.entries(project.rules?.tables ?? { notes: { tenant_column: "tenant_id" } });
   const tableLines = tables.map(([name, r]) => {
     const cols = ["id", r.tenant_column, r.user_column].filter(Boolean);
-    return `    ${name}: { columns: [${cols.map((c) => `"${c}"`).join(", ")} /* , …your other columns */] },`;
+    return `    ${name}: { columns: [${cols.map((c) => `"${c}"`).join(", ")} /* , …other columns */] },`;
   });
   const first = tables[0]![0];
   const firstTenant = tables[0]![1].tenant_column;

@@ -13,8 +13,14 @@ export async function proxy(request: NextRequest) {
   const expiry = token ? tokenExpiry(token) : null;
   const signedIn = expiry !== null && expiry > Date.now();
   const onAuthPage = pathname === "/login" || pathname === "/register";
+  const isApi = pathname.startsWith("/api/hecate/");
 
-  if (!signedIn || searchParams.has("expired")) {
+  // The browser's data requests (React Query → /api/hecate) get a JSON 401, not a redirect page.
+  if (isApi && !signedIn) {
+    return NextResponse.json({ statusCode: 401, message: "Your session has ended. Please sign in again." }, { status: 401 });
+  }
+
+  if (!isApi && (!signedIn || searchParams.has("expired"))) {
     // No usable session (or the backend rejected it): show the sign-in page and drop any stale cookie.
     const response = onAuthPage ? NextResponse.next() : NextResponse.redirect(new URL("/login", request.url));
     if (token) response.cookies.delete(SESSION_COOKIE);
@@ -37,5 +43,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/projects/:path*", "/settings/:path*", "/login", "/register"],
+  matcher: ["/projects/:path*", "/settings/:path*", "/login", "/register", "/api/hecate/:path*"],
 };

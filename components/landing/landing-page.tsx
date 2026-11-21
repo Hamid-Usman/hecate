@@ -13,6 +13,7 @@ const nav = [
   { href: "#architecture", label: "Architecture" },
   { href: "#guarantees", label: "Guarantees" },
   { href: "#roadmap", label: "Roadmap" },
+  { href: "/devlog", label: "Devlog" },
 ];
 
 const stackRow = ["SQLite", "PostgreSQL", "Go", "TypeScript", "Expo", "WebSockets", "pgx", "Docker"];
@@ -196,11 +197,11 @@ export function LandingPage() {
             ))}
           </nav>
           <div className="hidden items-center gap-2 lg:flex">
-            <Link href="#capabilities" className="rounded-full border border-ink/15 px-4 py-2 text-sm transition duration-300 ease-out hover:border-ink hover:bg-ink hover:text-paper">
+            <Link href="/register" className="rounded-full border border-ink/15 px-4 py-2 text-sm transition duration-300 ease-out hover:border-ink hover:bg-ink hover:text-paper">
               Get started
             </Link>
-            <Link href="#mvp" className="rounded-full bg-rust px-4 py-2 text-sm text-paper transition duration-300 ease-out hover:bg-bark">
-              Contact
+            <Link href="/login" className="rounded-full bg-rust px-4 py-2 text-sm text-paper transition duration-300 ease-out hover:bg-bark">
+              Sign in
             </Link>
           </div>
           <button

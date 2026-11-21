@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useRef, useState } from "react";
 import { Mark } from "@/components/landing/glyphs";
 import { logout } from "@/lib/actions";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { Skeleton } from "@/components/ui/primitives";
 import { ToastProvider } from "@/components/ui/toast";
+import { useAllProjects, useMe } from "@/lib/queries";
 import type { Account, Me, Project } from "@/lib/types";
 
 const initials = (s: string) =>
@@ -18,8 +20,10 @@ const initials = (s: string) =>
     .map((p) => p[0]!.toUpperCase())
     .join("");
 
-export function DashboardShell({ me, projects, children }: { me: Me; projects: Project[]; children: React.ReactNode }) {
+export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const me = useMe();
+  const projects = useAllProjects();
 
   return (
     <ToastProvider>
@@ -43,9 +47,13 @@ export function DashboardShell({ me, projects, children }: { me: Me; projects: P
         <aside
           className={`fixed inset-y-0 left-0 z-50 w-[272px] border-r border-ink/10 bg-paper transition-transform duration-300 ease-out lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
         >
-          <Suspense fallback={<SidebarSkeleton />}>
-            <SidebarContent me={me} projects={projects} onNavigate={() => setOpen(false)} onClose={() => setOpen(false)} />
-          </Suspense>
+          {me.data && !projects.isPending ? (
+            <Suspense fallback={<SidebarSkeleton />}>
+              <SidebarContent me={me.data} projects={projects.data} onNavigate={() => setOpen(false)} onClose={() => setOpen(false)} />
+            </Suspense>
+          ) : (
+            <SidebarSkeleton />
+          )}
         </aside>
 
         <main id="main" className="min-w-0 px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
@@ -72,6 +80,7 @@ function SidebarSkeleton() {
 
 function SidebarContent({ me, projects, onNavigate, onClose }: { me: Me; projects: Project[]; onNavigate: () => void; onClose: () => void }) {
   const pathname = usePathname();
+  const signOut = useSignOut();
   const nav: { href: string; label: string; icon: IconName; match: (p: string) => boolean }[] = [
     { href: "/projects", label: "Projects", icon: "projects", match: (p) => p === "/projects" },
     { href: "/settings", label: "Account", icon: "settings", match: (p) => p.startsWith("/settings") },
@@ -82,7 +91,7 @@ function SidebarContent({ me, projects, onNavigate, onClose }: { me: Me; project
       <div className="flex h-16 items-center justify-between px-5">
         <Link href="/projects" onClick={onNavigate} className="flex items-center gap-2.5">
           <Mark className="h-7 w-7" animated={false} />
-          <span className="font-serif text-2xl tracking-tight">Hecate</span>
+          <span className="font-serif text-2xl tracking-tight">Hecate's Torch</span>
         </Link>
         <button type="button" aria-label="Close menu" onClick={onClose} className="rounded-full p-2 text-slate hover:bg-ink/5 lg:hidden">
           <Icon name="close" />
@@ -145,7 +154,7 @@ function SidebarContent({ me, projects, onNavigate, onClose }: { me: Me; project
             <p className="truncate text-[13px] font-medium">{me.user.name ?? me.user.email}</p>
             <p className="truncate text-xs text-slate">{me.user.email}</p>
           </div>
-          <form action={logout}>
+          <form action={signOut}>
             <button type="submit" aria-label="Sign out" title="Sign out" className="rounded-full p-2 text-slate transition hover:bg-ink/5 hover:text-ink">
               <Icon name="logout" />
             </button>
@@ -190,5 +199,31 @@ function AccountSwitcher({ accounts, onNavigate }: { accounts: Account[]; onNavi
         ))}
       </div>
     </details>
+  );
+}
+
+/** Sign out, dropping every cached response first so the next person to sign in starts clean. */
+export function useSignOut() {
+  const qc = useQueryClient();
+  return async () => {
+    qc.clear();
+    await logout();
+  };
+}
+
+/** The whole dashboard while the session and first data load. */
+export function ShellSkeleton() {
+  return (
+    <div className="blueprint min-h-screen lg:grid lg:grid-cols-[272px_1fr]" aria-busy="true">
+      <aside className="hidden border-r border-ink/10 bg-paper lg:block">
+        <SidebarSkeleton />
+      </aside>
+      <main className="px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
+        <div className="mx-auto max-w-5xl space-y-6">
+          <Skeleton className="h-20 max-w-md" />
+          <Skeleton className="h-64" />
+        </div>
+      </main>
+    </div>
   );
 }
